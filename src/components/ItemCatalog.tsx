@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Search, Plus, Sword, Shield, Zap, Scroll, Gem, Package } from "lucide-react";
+import { Search, Plus, Sword, Shield, Zap, Scroll, Gem, Package, Edit } from "lucide-react";
+import ItemForm from "./ItemForm";
 
 interface Item {
   id: string;
@@ -84,6 +84,8 @@ const ItemCatalog = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedRarity, setSelectedRarity] = useState<string>('all');
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingItem, setEditingItem] = useState<Item | null>(null);
 
   const filteredItems = items.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -92,6 +94,36 @@ const ItemCatalog = () => {
     const matchesRarity = selectedRarity === 'all' || item.rarity === selectedRarity;
     return matchesSearch && matchesType && matchesRarity;
   });
+
+  const handleSaveItem = (itemData: Omit<Item, 'id'>) => {
+    if (editingItem) {
+      // Modifier objet existant
+      setItems(prev => prev.map(item => 
+        item.id === editingItem.id 
+          ? { ...itemData, id: editingItem.id }
+          : item
+      ));
+      setEditingItem(null);
+    } else {
+      // Ajouter nouvel objet
+      const newItem: Item = {
+        ...itemData,
+        id: Date.now().toString()
+      };
+      setItems(prev => [...prev, newItem]);
+    }
+    console.log('Objet sauvegardé:', itemData);
+  };
+
+  const handleEditItem = (item: Item) => {
+    setEditingItem(item);
+    setShowAddForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowAddForm(false);
+    setEditingItem(null);
+  };
 
   const getTypeIcon = (type: Item['type']) => {
     switch (type) {
@@ -144,69 +176,202 @@ const ItemCatalog = () => {
     misc: items.filter(item => item.type === 'misc')
   };
 
+  const ItemCard = ({ item }: { item: Item }) => (
+    <Card className="dungeon-card hover:scale-105 transition-transform duration-300">
+      <CardHeader className="pb-3">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-dungeon-700/50 rounded-lg flex items-center justify-center border border-gold-500/30">
+            {getTypeIcon(item.type)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-gold-200 text-sm sm:text-lg mb-1 truncate">{item.name}</CardTitle>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+              <Badge className={getRarityColor(item.rarity)}>
+                {getRarityName(item.rarity)}
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                {getTypeName(item.type)}
+              </Badge>
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3">
+          {item.description}
+        </p>
+
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-sm">
+          <span className="text-gold-300 font-semibold">{item.value.toLocaleString()} po</span>
+          <span className="text-muted-foreground text-xs sm:text-sm">
+            {item.owner ? `${item.owner}` : 
+             item.location ? `${item.location}` : 'Non attribué'}
+          </span>
+        </div>
+
+        {item.properties && item.properties.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {item.properties.slice(0, 3).map((prop, index) => (
+              <Badge key={index} variant="outline" className="text-xs bg-dungeon-800/50">
+                {prop}
+              </Badge>
+            ))}
+            {item.properties.length > 3 && (
+              <span className="text-xs text-muted-foreground">+{item.properties.length - 3}</span>
+            )}
+          </div>
+        )}
+
+        <div className="flex gap-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="flex-1 border-gold-500/30 hover:bg-gold-600/20 text-xs sm:text-sm">
+                Détails
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl dungeon-card">
+              <DialogHeader>
+                <DialogTitle className="text-gold-200 text-xl flex items-center gap-2">
+                  {getTypeIcon(item.type)}
+                  {item.name}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Badge className={getRarityColor(item.rarity)}>
+                    {getRarityName(item.rarity)}
+                  </Badge>
+                  <Badge variant="outline">
+                    {getTypeName(item.type)}
+                  </Badge>
+                  <span className="text-gold-300 font-semibold text-lg ml-auto">
+                    {item.value.toLocaleString()} po
+                  </span>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-gold-200 mb-2">Description</h4>
+                  <p className="text-sm leading-relaxed">{item.description}</p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-gold-200 mb-2">Effets</h4>
+                  <p className="text-sm leading-relaxed text-green-300">{item.effects}</p>
+                </div>
+
+                {item.properties && item.properties.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gold-200 mb-2">Propriétés</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {item.properties.map((prop, index) => (
+                        <Badge key={index} variant="outline" className="bg-dungeon-800/50">
+                          {prop}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="border-t border-gold-500/20 pt-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-muted-foreground text-sm">Propriétaire:</span>
+                      <p className="text-gold-200 font-medium">
+                        {item.owner || 'Non attribué'}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground text-sm">Localisation:</span>
+                      <p className="text-gold-200 font-medium">
+                        {item.location || 'Inconnue'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleEditItem(item)}
+            className="border-gold-500/30 hover:bg-gold-600/20"
+          >
+            <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-fantasy font-bold text-gold-200 mb-2">
+          <h2 className="text-2xl sm:text-3xl font-fantasy font-bold text-gold-200 mb-2">
             Catalogue d'Objets
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Gérez l'inventaire légendaire des Maraudeurs de Joyaux Tendres
           </p>
         </div>
-        <Button className="bg-gold-600 hover:bg-gold-700 text-dungeon-900">
-          <Plus className="w-4 h-4 mr-2" />
-          Nouvel Objet
+        <Button 
+          onClick={() => setShowAddForm(true)}
+          className="bg-gold-600 hover:bg-gold-700 text-dungeon-900 text-sm sm:text-base"
+          size="sm"
+        >
+          <Plus className="w-4 h-4 mr-1 sm:mr-2" />
+          <span className="hidden sm:inline">Nouvel Objet</span>
+          <span className="sm:hidden">Objet</span>
         </Button>
       </div>
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-7 bg-dungeon-800/50 border border-gold-500/30">
-          <TabsTrigger value="all" className="data-[state=active]:bg-gold-600/20">
+          <TabsTrigger value="all" className="data-[state=active]:bg-gold-600/20 text-xs sm:text-sm">
             Tous
           </TabsTrigger>
-          <TabsTrigger value="weapon" className="data-[state=active]:bg-gold-600/20">
-            <Sword className="w-4 h-4 mr-1" />
-            Armes
+          <TabsTrigger value="weapon" className="data-[state=active]:bg-gold-600/20 text-xs sm:text-sm">
+            <Sword className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+            <span className="hidden sm:inline">Armes</span>
           </TabsTrigger>
-          <TabsTrigger value="armor" className="data-[state=active]:bg-gold-600/20">
-            <Shield className="w-4 h-4 mr-1" />
-            Armures
+          <TabsTrigger value="armor" className="data-[state=active]:bg-gold-600/20 text-xs sm:text-sm">
+            <Shield className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+            <span className="hidden sm:inline">Armures</span>
           </TabsTrigger>
-          <TabsTrigger value="potion" className="data-[state=active]:bg-gold-600/20">
-            <Zap className="w-4 h-4 mr-1" />
-            Potions
+          <TabsTrigger value="potion" className="data-[state=active]:bg-gold-600/20 text-xs sm:text-sm">
+            <Zap className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+            <span className="hidden sm:inline">Potions</span>
           </TabsTrigger>
-          <TabsTrigger value="scroll" className="data-[state=active]:bg-gold-600/20">
-            <Scroll className="w-4 h-4 mr-1" />
-            Parchemins
+          <TabsTrigger value="scroll" className="data-[state=active]:bg-gold-600/20 text-xs sm:text-sm">
+            <Scroll className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+            <span className="hidden sm:inline">Parchemins</span>
           </TabsTrigger>
-          <TabsTrigger value="treasure" className="data-[state=active]:bg-gold-600/20">
-            <Gem className="w-4 h-4 mr-1" />
-            Trésors
+          <TabsTrigger value="treasure" className="data-[state=active]:bg-gold-600/20 text-xs sm:text-sm">
+            <Gem className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+            <span className="hidden sm:inline">Trésors</span>
           </TabsTrigger>
-          <TabsTrigger value="misc" className="data-[state=active]:bg-gold-600/20">
-            <Package className="w-4 h-4 mr-1" />
-            Divers
+          <TabsTrigger value="misc" className="data-[state=active]:bg-gold-600/20 text-xs sm:text-sm">
+            <Package className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+            <span className="hidden sm:inline">Divers</span>
           </TabsTrigger>
         </TabsList>
 
         {/* Filters */}
-        <div className="flex gap-4 items-center mt-4">
-          <div className="relative flex-1 max-w-md">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center mt-4">
+          <div className="relative flex-1 max-w-full sm:max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Rechercher un objet..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-dungeon-800/50 border-gold-500/30"
+              className="pl-10 bg-dungeon-800/50 border-gold-500/30 text-sm"
             />
           </div>
           <select
             value={selectedRarity}
             onChange={(e) => setSelectedRarity(e.target.value)}
-            className="px-3 py-2 rounded bg-dungeon-800/50 border border-gold-500/30 text-foreground"
+            className="px-3 py-2 rounded bg-dungeon-800/50 border border-gold-500/30 text-foreground text-sm"
           >
             <option value="all">Toutes les raretés</option>
             <option value="common">Commun</option>
@@ -218,132 +383,9 @@ const ItemCatalog = () => {
         </div>
 
         <TabsContent value="all" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredItems.map((item) => (
-              <Card key={item.id} className="dungeon-card hover:scale-105 transition-transform duration-300">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 bg-dungeon-700/50 rounded-lg flex items-center justify-center border border-gold-500/30">
-                      {getTypeIcon(item.type)}
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-gold-200 text-lg mb-1">{item.name}</CardTitle>
-                      <div className="flex items-center gap-2">
-                        <Badge className={getRarityColor(item.rarity)}>
-                          {getRarityName(item.rarity)}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {getTypeName(item.type)}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <p className="text-sm text-muted-foreground line-clamp-3">
-                    {item.description}
-                  </p>
-
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gold-300 font-semibold">{item.value.toLocaleString()} po</span>
-                    <span className="text-muted-foreground">
-                      {item.owner ? `Possédé par ${item.owner}` : 
-                       item.location ? `En ${item.location}` : 'Non attribué'}
-                    </span>
-                  </div>
-
-                  {item.properties && item.properties.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {item.properties.slice(0, 3).map((prop, index) => (
-                        <Badge key={index} variant="outline" className="text-xs bg-dungeon-800/50">
-                          {prop}
-                        </Badge>
-                      ))}
-                      {item.properties.length > 3 && (
-                        <span className="text-xs text-muted-foreground">+{item.properties.length - 3}</span>
-                      )}
-                    </div>
-                  )}
-
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="w-full border-gold-500/30 hover:bg-gold-600/20">
-                        Voir les détails
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl dungeon-card">
-                      <DialogHeader>
-                        <DialogTitle className="text-gold-200 text-xl flex items-center gap-2">
-                          {getTypeIcon(item.type)}
-                          {item.name}
-                        </DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                          <Badge className={getRarityColor(item.rarity)}>
-                            {getRarityName(item.rarity)}
-                          </Badge>
-                          <Badge variant="outline">
-                            {getTypeName(item.type)}
-                          </Badge>
-                          <span className="text-gold-300 font-semibold text-lg ml-auto">
-                            {item.value.toLocaleString()} po
-                          </span>
-                        </div>
-
-                        <div>
-                          <h4 className="font-semibold text-gold-200 mb-2">Description</h4>
-                          <p className="text-sm leading-relaxed">{item.description}</p>
-                        </div>
-
-                        <div>
-                          <h4 className="font-semibold text-gold-200 mb-2">Effets</h4>
-                          <p className="text-sm leading-relaxed text-green-300">{item.effects}</p>
-                        </div>
-
-                        {item.properties && item.properties.length > 0 && (
-                          <div>
-                            <h4 className="font-semibold text-gold-200 mb-2">Propriétés</h4>
-                            <div className="flex flex-wrap gap-2">
-                              {item.properties.map((prop, index) => (
-                                <Badge key={index} variant="outline" className="bg-dungeon-800/50">
-                                  {prop}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="border-t border-gold-500/20 pt-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <span className="text-muted-foreground text-sm">Propriétaire:</span>
-                              <p className="text-gold-200 font-medium">
-                                {item.owner || 'Non attribué'}
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground text-sm">Localisation:</span>
-                              <p className="text-gold-200 font-medium">
-                                {item.location || 'Inconnue'}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2">
-                          <Button size="sm" className="flex-1 bg-gold-600 hover:bg-gold-700 text-dungeon-900">
-                            Modifier
-                          </Button>
-                          <Button size="sm" variant="outline" className="flex-1">
-                            Transférer
-                          </Button>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </CardContent>
-              </Card>
+              <ItemCard key={item.id} item={item} />
             ))}
           </div>
         </TabsContent>
@@ -351,41 +393,17 @@ const ItemCatalog = () => {
         {/* Individual type tabs */}
         {Object.entries(groupedItems).map(([type, typeItems]) => (
           <TabsContent key={type} value={type} className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {typeItems.map((item) => (
-                <Card key={item.id} className="dungeon-card hover:scale-105 transition-transform duration-300">
-                  {/* Same card content as above */}
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start gap-3">
-                      <div className="w-12 h-12 bg-dungeon-700/50 rounded-lg flex items-center justify-center border border-gold-500/30">
-                        {getTypeIcon(item.type)}
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-gold-200 text-lg mb-1">{item.name}</CardTitle>
-                        <Badge className={getRarityColor(item.rarity)}>
-                          {getRarityName(item.rarity)}
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {item.description}
-                    </p>
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-gold-300 font-semibold">{item.value.toLocaleString()} po</span>
-                      <span className="text-muted-foreground">
-                        {item.owner ? `${item.owner}` : item.location || 'Non attribué'}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
+                <ItemCard key={item.id} item={item} />
               ))}
             </div>
             {typeItems.length === 0 && (
               <div className="text-center py-12">
-                {getTypeIcon(type as Item['type'])}
-                <h3 className="text-lg font-semibold text-gold-200 mb-2 mt-4">
+                <div className="w-12 h-12 mx-auto mb-4 bg-dungeon-700/50 rounded-lg flex items-center justify-center">
+                  {getTypeIcon(type as Item['type'])}
+                </div>
+                <h3 className="text-lg font-semibold text-gold-200 mb-2">
                   Aucun {getTypeName(type as Item['type']).toLowerCase()}
                 </h3>
                 <p className="text-muted-foreground">
@@ -396,6 +414,13 @@ const ItemCatalog = () => {
           </TabsContent>
         ))}
       </Tabs>
+      
+      <ItemForm
+        isOpen={showAddForm}
+        onClose={handleCloseForm}
+        onSave={handleSaveItem}
+        editingItem={editingItem}
+      />
     </div>
   );
 };

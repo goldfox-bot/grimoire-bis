@@ -1,13 +1,12 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, Plus, MapPin, ShoppingCart, Crown, Sword, Users, Heart } from "lucide-react";
+import { Search, Plus, MapPin, ShoppingCart, Crown, Sword, Users, Heart, Edit } from "lucide-react";
+import NPCForm from "./NPCForm";
 
 interface NPC {
   id: string;
@@ -94,6 +93,7 @@ const NPCDirectory = () => {
   const [selectedRole, setSelectedRole] = useState<string>('all');
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingNPC, setEditingNPC] = useState<NPC | null>(null);
 
   const filteredNPCs = npcs.filter(npc => {
     const matchesSearch = npc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -101,6 +101,36 @@ const NPCDirectory = () => {
     const matchesRole = selectedRole === 'all' || npc.role === selectedRole;
     return matchesSearch && matchesRole;
   });
+
+  const handleSaveNPC = (npcData: Omit<NPC, 'id'>) => {
+    if (editingNPC) {
+      // Modifier PNJ existant
+      setNpcs(prev => prev.map(npc => 
+        npc.id === editingNPC.id 
+          ? { ...npcData, id: editingNPC.id }
+          : npc
+      ));
+      setEditingNPC(null);
+    } else {
+      // Ajouter nouveau PNJ
+      const newNPC: NPC = {
+        ...npcData,
+        id: Date.now().toString()
+      };
+      setNpcs(prev => [...prev, newNPC]);
+    }
+    console.log('PNJ sauvegardé:', npcData);
+  };
+
+  const handleEditNPC = (npc: NPC) => {
+    setEditingNPC(npc);
+    setShowAddForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowAddForm(false);
+    setEditingNPC(null);
+  };
 
   const getRoleIcon = (role: NPC['role']) => {
     switch (role) {
@@ -134,40 +164,42 @@ const NPCDirectory = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-fantasy font-bold text-gold-200 mb-2">
+          <h2 className="text-2xl sm:text-3xl font-fantasy font-bold text-gold-200 mb-2">
             Annuaire des PNJ
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Gérez vos personnages non-joueurs et leurs relations avec les Maraudeurs
           </p>
         </div>
         <Button
           onClick={() => setShowAddForm(true)}
-          className="bg-gold-600 hover:bg-gold-700 text-dungeon-900"
+          className="bg-gold-600 hover:bg-gold-700 text-dungeon-900 text-sm sm:text-base"
+          size="sm"
         >
-          <Plus className="w-4 h-4 mr-2" />
-          Nouveau PNJ
+          <Plus className="w-4 h-4 mr-1 sm:mr-2" />
+          <span className="hidden sm:inline">Nouveau PNJ</span>
+          <span className="sm:hidden">PNJ</span>
         </Button>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 items-center">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center">
+        <div className="relative flex-1 max-w-full sm:max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Rechercher un PNJ ou un lieu..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-dungeon-800/50 border-gold-500/30"
+            className="pl-10 bg-dungeon-800/50 border-gold-500/30 text-sm"
           />
         </div>
         <select
           value={selectedRole}
           onChange={(e) => setSelectedRole(e.target.value)}
-          className="px-3 py-2 rounded bg-dungeon-800/50 border border-gold-500/30 text-foreground"
+          className="px-3 py-2 rounded bg-dungeon-800/50 border border-gold-500/30 text-foreground text-sm"
         >
           <option value="all">Tous les rôles</option>
           <option value="ally">Alliés</option>
@@ -180,35 +212,35 @@ const NPCDirectory = () => {
       </div>
 
       {/* NPC Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {filteredNPCs.map((npc) => (
           <Card key={npc.id} className="dungeon-card hover:scale-105 transition-transform duration-300">
             <CardHeader className="pb-3">
               <div className="flex items-start gap-3">
-                <Avatar className="w-16 h-16 border-2 border-gold-500/30">
+                <Avatar className="w-12 h-12 sm:w-16 sm:h-16 border-2 border-gold-500/30">
                   <AvatarImage src={npc.portrait} />
-                  <AvatarFallback className="bg-dungeon-700 text-gold-200 font-bold text-lg">
+                  <AvatarFallback className="bg-dungeon-700 text-gold-200 font-bold text-sm sm:text-lg">
                     {npc.name.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex-1">
-                  <CardTitle className="text-gold-200 text-lg mb-1">{npc.name}</CardTitle>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                    <span>{npc.race}</span>
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-gold-200 text-base sm:text-lg mb-1 truncate">{npc.name}</CardTitle>
+                  <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground mb-2">
+                    <span className="truncate">{npc.race}</span>
                     <span>•</span>
-                    <span>{npc.class}</span>
+                    <span className="truncate">{npc.class}</span>
                     <span>•</span>
                     <span>Niv. {npc.level}</span>
                   </div>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <MapPin className="w-3 h-3" />
+                  <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
+                    <MapPin className="w-3 h-3 flex-shrink-0" />
                     <span className="truncate">{npc.location}</span>
                   </div>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between">
                 <Badge className={getRoleColor(npc.role)}>
                   {getRoleIcon(npc.role)}
                   <span className="ml-1 capitalize">{npc.role}</span>
@@ -221,7 +253,7 @@ const NPCDirectory = () => {
                 </div>
               </div>
               
-              <p className="text-sm text-muted-foreground line-clamp-3">
+              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3">
                 {npc.description}
               </p>
 
@@ -237,94 +269,104 @@ const NPCDirectory = () => {
                 </div>
               )}
 
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full border-gold-500/30 hover:bg-gold-600/20"
-                    onClick={() => setSelectedNPC(npc)}
-                  >
-                    Voir les détails
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl dungeon-card">
-                  <DialogHeader>
-                    <DialogTitle className="text-gold-200 text-xl">{npc.name}</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-4">
-                      <Avatar className="w-20 h-20 border-2 border-gold-500/30">
-                        <AvatarImage src={npc.portrait} />
-                        <AvatarFallback className="bg-dungeon-700 text-gold-200 font-bold text-xl">
-                          {npc.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 space-y-2">
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="text-muted-foreground">Race:</span>
-                            <span className="ml-2 text-gold-200">{npc.race}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Classe:</span>
-                            <span className="ml-2 text-gold-200">{npc.class}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Niveau:</span>
-                            <span className="ml-2 text-gold-200">{npc.level}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Lieu:</span>
-                            <span className="ml-2 text-gold-200">{npc.location}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge className={getRoleColor(npc.role)}>
-                            {getRoleIcon(npc.role)}
-                            <span className="ml-1 capitalize">{npc.role}</span>
-                          </Badge>
-                          <span className={`text-sm ${getRelationshipColor(npc.relationship)}`}>
-                            Relation: {npc.relationship}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="font-semibold text-gold-200 mb-2">Description</h4>
-                      <p className="text-sm leading-relaxed">{npc.description}</p>
-                    </div>
-
-                    {npc.notes && (
-                      <div>
-                        <h4 className="font-semibold text-gold-200 mb-2">Notes du MJ</h4>
-                        <p className="text-sm leading-relaxed text-muted-foreground">{npc.notes}</p>
-                      </div>
-                    )}
-
-                    {npc.items && npc.items.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold text-gold-200 mb-3 flex items-center gap-2">
-                          <ShoppingCart className="w-4 h-4" />
-                          Boutique
-                        </h4>
-                        <div className="grid gap-2">
-                          {npc.items.map((item, index) => (
-                            <div key={index} className="flex justify-between items-center p-2 bg-dungeon-800/50 rounded border border-gold-500/20">
-                              <div>
-                                <span className="font-medium text-gold-200">{item.name}</span>
-                                <span className="ml-2 text-xs text-muted-foreground">({item.type})</span>
-                              </div>
-                              <span className="text-gold-300 font-semibold">{item.price} po</span>
+              <div className="flex gap-2">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1 border-gold-500/30 hover:bg-gold-600/20 text-xs sm:text-sm"
+                      onClick={() => setSelectedNPC(npc)}
+                    >
+                      Détails
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl dungeon-card">
+                    <DialogHeader>
+                      <DialogTitle className="text-gold-200 text-xl">{npc.name}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-4">
+                        <Avatar className="w-20 h-20 border-2 border-gold-500/30">
+                          <AvatarImage src={npc.portrait} />
+                          <AvatarFallback className="bg-dungeon-700 text-gold-200 font-bold text-xl">
+                            {npc.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 space-y-2">
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="text-muted-foreground">Race:</span>
+                              <span className="ml-2 text-gold-200">{npc.race}</span>
                             </div>
-                          ))}
+                            <div>
+                              <span className="text-muted-foreground">Classe:</span>
+                              <span className="ml-2 text-gold-200">{npc.class}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Niveau:</span>
+                              <span className="ml-2 text-gold-200">{npc.level}</span>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground">Lieu:</span>
+                              <span className="ml-2 text-gold-200">{npc.location}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge className={getRoleColor(npc.role)}>
+                              {getRoleIcon(npc.role)}
+                              <span className="ml-1 capitalize">{npc.role}</span>
+                            </Badge>
+                            <span className={`text-sm ${getRelationshipColor(npc.relationship)}`}>
+                              Relation: {npc.relationship}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    )}
-                  </div>
-                </DialogContent>
-              </Dialog>
+
+                      <div>
+                        <h4 className="font-semibold text-gold-200 mb-2">Description</h4>
+                        <p className="text-sm leading-relaxed">{npc.description}</p>
+                      </div>
+
+                      {npc.notes && (
+                        <div>
+                          <h4 className="font-semibold text-gold-200 mb-2">Notes du MJ</h4>
+                          <p className="text-sm leading-relaxed text-muted-foreground">{npc.notes}</p>
+                        </div>
+                      )}
+
+                      {npc.items && npc.items.length > 0 && (
+                        <div>
+                          <h4 className="font-semibold text-gold-200 mb-3 flex items-center gap-2">
+                            <ShoppingCart className="w-4 h-4" />
+                            Boutique
+                          </h4>
+                          <div className="grid gap-2">
+                            {npc.items.map((item, index) => (
+                              <div key={index} className="flex justify-between items-center p-2 bg-dungeon-800/50 rounded border border-gold-500/20">
+                                <div>
+                                  <span className="font-medium text-gold-200">{item.name}</span>
+                                  <span className="ml-2 text-xs text-muted-foreground">({item.type})</span>
+                                </div>
+                                <span className="text-gold-300 font-semibold">{item.price} po</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleEditNPC(npc)}
+                  className="border-gold-500/30 hover:bg-gold-600/20"
+                >
+                  <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -342,6 +384,13 @@ const NPCDirectory = () => {
           </p>
         </div>
       )}
+
+      <NPCForm
+        isOpen={showAddForm}
+        onClose={handleCloseForm}
+        onSave={handleSaveNPC}
+        editingNPC={editingNPC}
+      />
     </div>
   );
 };
