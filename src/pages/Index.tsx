@@ -19,8 +19,9 @@ const Index = () => {
       {/* Header */}
       <div className="text-center mb-12">
         <div className="float-animation">
-          <h1 className="text-7xl font-fantasy font-bold adventure-glow mb-6 leading-tight">
-            Les Maraudeurs de Joyaux Tendres
+          <h1 className="text-5xl md:text-7xl font-fantasy font-bold adventure-glow mb-6 leading-tight">
+            <div>Les Maraudeurs</div>
+            <div>de Joyaux Tendres</div>
           </h1>
         </div>
         <p className="text-2xl text-slate-300 mb-4 font-modern font-light">
