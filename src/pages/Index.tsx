@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -86,75 +85,7 @@ const Index = () => {
 
         <TabsContent value="accueil" className="animate-fade-in">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
-            <Card className="modern-card group">
-              <CardHeader className="pb-3 sm:pb-6">
-                <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg text-slate-100 group-hover:text-orange-200 transition-colors">
-                  <MapPin className="w-4 h-4 sm:w-6 sm:h-6 text-orange-400" />
-                  Carte Interactive
-                </CardTitle>
-                <CardDescription className="text-xs sm:text-sm text-slate-400">
-                  Explorez les terres mystérieuses et les cités légendaires
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-xs sm:text-sm mb-4 sm:mb-6 text-slate-300 leading-relaxed">
-                  Naviguez à travers les royaumes, découvrez les lieux secrets et gérez les emplacements de vos PNJ.
-                </p>
-                <Button 
-                  onClick={() => setActiveTab("carte")} 
-                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-sm py-2"
-                >
-                  Ouvrir la Carte
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="modern-card group">
-              <CardHeader className="pb-3 sm:pb-6">
-                <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg text-slate-100 group-hover:text-orange-200 transition-colors">
-                  <Users className="w-4 h-4 sm:w-6 sm:h-6 text-blue-400" />
-                  Annuaire des PNJ
-                </CardTitle>
-                <CardDescription className="text-xs sm:text-sm text-slate-400">
-                  Gérez vos personnages non-joueurs et leurs relations
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-xs sm:text-sm mb-4 sm:mb-6 text-slate-300 leading-relaxed">
-                  Créez des fiches détaillées pour chaque PNJ avec portraits, descriptions et inventaires marchands.
-                </p>
-                <Button 
-                  onClick={() => setActiveTab("pnj")} 
-                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-sm py-2"
-                >
-                  Voir les PNJ
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="modern-card group">
-              <CardHeader className="pb-3 sm:pb-6">
-                <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg text-slate-100 group-hover:text-orange-200 transition-colors">
-                  <Sword className="w-4 h-4 sm:w-6 sm:h-6 text-purple-400" />
-                  Catalogue d'Objets
-                </CardTitle>
-                <CardDescription className="text-xs sm:text-sm text-slate-400">
-                  Armes, armures, potions et trésors magiques
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-xs sm:text-sm mb-4 sm:mb-6 text-slate-300 leading-relaxed">
-                  Gérez l'inventaire du groupe et les objets légendaires de votre campagne.
-                </p>
-                <Button 
-                  onClick={() => setActiveTab("objets")} 
-                  className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-sm py-2"
-                >
-                  Explorer le Catalogue
-                </Button>
-              </CardContent>
-            </Card>
-
+            {/* Fiche de Groupe - First */}
             <Card className="modern-card group">
               <CardHeader className="pb-3 sm:pb-6">
                 <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg text-slate-100 group-hover:text-orange-200 transition-colors">
@@ -178,6 +109,55 @@ const Index = () => {
               </CardContent>
             </Card>
 
+            {/* Annuaire des PNJ - Second */}
+            <Card className="modern-card group">
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg text-slate-100 group-hover:text-orange-200 transition-colors">
+                  <Users className="w-4 h-4 sm:w-6 sm:h-6 text-blue-400" />
+                  Annuaire des PNJ
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm text-slate-400">
+                  Gérez vos personnages non-joueurs et leurs relations
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <p className="text-xs sm:text-sm mb-4 sm:mb-6 text-slate-300 leading-relaxed">
+                  Créez des fiches détaillées pour chaque PNJ avec portraits, descriptions et inventaires marchands.
+                </p>
+                <Button 
+                  onClick={() => setActiveTab("pnj")} 
+                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-sm py-2"
+                >
+                  Voir les PNJ
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Catalogue d'Objets - Third */}
+            <Card className="modern-card group">
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg text-slate-100 group-hover:text-orange-200 transition-colors">
+                  <Sword className="w-4 h-4 sm:w-6 sm:h-6 text-purple-400" />
+                  Catalogue d'Objets
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm text-slate-400">
+                  Armes, armures, potions et trésors magiques
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <p className="text-xs sm:text-sm mb-4 sm:mb-6 text-slate-300 leading-relaxed">
+                  Gérez l'inventaire du groupe et les objets légendaires de votre campagne.
+                </p>
+                <Button 
+                  onClick={() => setActiveTab("objets")} 
+                  className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-sm py-2"
+                >
+                  Explorer le Catalogue
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Histoires des Personnages - Fourth */}
             <Card className="modern-card group">
               <CardHeader className="pb-3 sm:pb-6">
                 <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg text-slate-100 group-hover:text-orange-200 transition-colors">
@@ -201,6 +181,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
+            {/* Galerie d'Ambiance - Fifth */}
             <Card className="modern-card group">
               <CardHeader className="pb-3 sm:pb-6">
                 <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg text-slate-100 group-hover:text-orange-200 transition-colors">
@@ -217,6 +198,30 @@ const Index = () => {
                 </p>
                 <Button className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-sm py-2">
                   Ouvrir la Galerie
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Carte Interactive - Last */}
+            <Card className="modern-card group">
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg text-slate-100 group-hover:text-orange-200 transition-colors">
+                  <MapPin className="w-4 h-4 sm:w-6 sm:h-6 text-orange-400" />
+                  Carte Interactive
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm text-slate-400">
+                  Explorez les terres mystérieuses et les cités légendaires
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <p className="text-xs sm:text-sm mb-4 sm:mb-6 text-slate-300 leading-relaxed">
+                  Naviguez à travers les royaumes, découvrez les lieux secrets et gérez les emplacements de vos PNJ.
+                </p>
+                <Button 
+                  onClick={() => setActiveTab("carte")} 
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-sm py-2"
+                >
+                  Ouvrir la Carte
                 </Button>
               </CardContent>
             </Card>
