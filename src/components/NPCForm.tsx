@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Save, X } from "lucide-react";
-import ImageUpload from "./ImageUpload";
 
 interface NPC {
   id: string;
@@ -43,7 +43,6 @@ const NPCForm = ({ isOpen, onClose, onSave, editingNPC }: NPCFormProps) => {
     location: editingNPC?.location || '',
     role: editingNPC?.role || 'neutral' as const,
     description: editingNPC?.description || '',
-    portrait: editingNPC?.portrait || '',
     relationship: editingNPC?.relationship || 'neutral' as const,
     notes: editingNPC?.notes || '',
     items: editingNPC?.items || []
@@ -67,7 +66,6 @@ const NPCForm = ({ isOpen, onClose, onSave, editingNPC }: NPCFormProps) => {
       location: '',
       role: 'neutral',
       description: '',
-      portrait: '',
       relationship: 'neutral',
       notes: '',
       items: []
@@ -112,21 +110,6 @@ const NPCForm = ({ isOpen, onClose, onSave, editingNPC }: NPCFormProps) => {
                 required
               />
             </div>
-            
-            {/* Portrait Upload Section */}
-            <div>
-              <Label className="text-gold-200">Portrait</Label>
-              <div className="flex items-center gap-2 mt-1">
-                <ImageUpload
-                  currentImage={formData.portrait}
-                  onImageChange={(imageUrl) => setFormData(prev => ({ ...prev, portrait: imageUrl || '' }))}
-                />
-                {formData.portrait && (
-                  <span className="text-xs text-green-400">✓ Portrait ajouté</span>
-                )}
-              </div>
-            </div>
-            
             <div>
               <Label htmlFor="race" className="text-gold-200">Race</Label>
               <Input

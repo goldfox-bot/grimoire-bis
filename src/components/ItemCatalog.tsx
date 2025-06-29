@@ -2,13 +2,13 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Search, Edit2, Trash2, Sword, Shield, FlaskConical, Scroll, Crown, Package, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, Plus, Sword, Shield, Zap, Scroll, Gem, Package, Edit, User } from "lucide-react";
 import ItemForm from "./ItemForm";
-import VisualCard from "./VisualCard";
 
 interface Item {
   id: string;
@@ -25,431 +25,449 @@ interface Item {
 }
 
 const ItemCatalog = () => {
+  // Liste des joueurs disponibles
+  const players = [
+    'Sfiri Fortenclume',
+    'Arannis Foxward',
+    'Naïa Nightfrost',
+    'Caellum Brisemousse'
+  ];
+
   const [items, setItems] = useState<Item[]>([
     {
       id: '1',
-      name: 'Épée Longue +1',
+      name: 'Épée de Flamme Éternelle',
       type: 'weapon',
-      rarity: 'uncommon',
-      description: 'Une épée longue avec une lame finement travaillée, imprégnée d\'une magie subtile qui améliore sa capacité à trancher.',
-      effects: '+1 aux jets d\'attaque et de dégâts.',
-      value: 350,
+      rarity: 'rare',
+      description: 'Cette épée longue ancienne brille d\'une flamme dorée qui ne s\'éteint jamais. Forgée par les maîtres elfes il y a des millénaires.',
+      effects: '+2 aux jets d\'attaque et de dégâts. Inflige 1d6 dégâts de feu supplémentaires. Émet une lumière vive dans un rayon de 3 mètres.',
+      value: 5000,
       owner: 'Arannis Foxward',
-      location: 'Inventaire',
-      properties: ['magique', 'tranchant']
+      properties: ['Magique', 'Feu', 'Lumineux']
     },
     {
       id: '2',
-      name: 'Armure de Cuir cloutée',
+      name: 'Armure du Gardien Stellaire',
       type: 'armor',
-      rarity: 'common',
-      description: 'Une armure de cuir renforcée avec des clous en métal, offrant une protection fiable sans sacrifier la mobilité.',
-      effects: 'CA 12 + Modificateur de Dextérité (max 2)',
-      value: 45,
-      owner: 'Naïa Nightfrost',
-      location: 'Portée',
-      properties: ['légère', 'discrète']
+      rarity: 'very-rare',
+      description: 'Armure de plates ornée de motifs stellaires qui scintillent dans l\'obscurité. Portée par les anciens gardiens des temples célestes.',
+      effects: 'CA 18 + mod Dex (max 2). Résistance aux dégâts radiants. Une fois par jour, peut lancer "Bouclier de foi".',
+      value: 8000,
+      owner: 'Sfiri Fortenclume',
+      properties: ['Magique', 'Radiant', 'Stellaire']
     },
     {
       id: '3',
-      name: 'Potion de Soin Supérieur',
+      name: 'Potion de Guérison Majeure',
       type: 'potion',
-      rarity: 'rare',
-      description: 'Une potion scintillante qui restaure une quantité importante de points de vie.',
-      effects: 'Restaure 4d4 + 4 points de vie.',
-      value: 250,
-      owner: 'Sfiri Fortenclume',
-      location: 'Ceinture',
-      properties: ['consommable', 'magique']
+      rarity: 'uncommon',
+      description: 'Fiole de cristal contenant un liquide rouge rubis qui pulse comme un cœur battant.',
+      effects: 'Restaure 4d4+4 points de vie instantanément.',
+      value: 300,
+      location: 'Réserve du groupe',
+      properties: ['Consommable', 'Soin']
     },
     {
       id: '4',
-      name: 'Parchemin de Boule de Feu',
+      name: 'Parchemin de Téléportation',
       type: 'scroll',
       rarity: 'rare',
-      description: 'Un parchemin magique contenant le sort Boule de Feu.',
-      effects: 'Lance le sort Boule de Feu (8d6 dégâts de feu, jet de sauvegarde de Dextérité pour réduire de moitié).',
-      value: 500,
-      owner: 'Caellum Brisemousse',
-      location: 'Sacoche',
-      properties: ['à usage unique', 'magique']
+      description: 'Parchemin ancien écrit dans une langue oubliée, dont les runes brillent d\'une lueur bleutée.',
+      effects: 'Permet de lancer le sort "Téléportation" sans dépenser d\'emplacement de sort.',
+      value: 1500,
+      location: 'Bibliothèque d\'Eldric',
+      properties: ['Magique', 'Téléportation', 'Usage unique']
     },
     {
       id: '5',
-      name: 'Couronne de Velours',
+      name: 'Joyau Tendre de Sagesse',
       type: 'treasure',
-      rarity: 'uncommon',
-      description: 'Une couronne de velours sertie de fausses pierres précieuses, symbole d\'une noblesse déchue.',
-      effects: 'Aucun effet direct, mais peut être utilisée pour impressionner ou tromper.',
-      value: 75,
-      owner: '',
-      location: 'Coffre',
-      properties: ['apparat', 'tromperie']
-    },
-    {
-      id: '6',
-      name: 'Fiole d\'acide',
-      type: 'misc',
-      rarity: 'common',
-      description: 'Une fiole contenant un acide corrosif.',
-      effects: '1d6 dégâts d\'acide.',
-      value: 25,
-      owner: '',
-      location: 'Sacoche',
-      properties: ['jetable', 'acide']
-    },
-    {
-      id: '7',
-      name: 'Arc court',
-      type: 'weapon',
-      rarity: 'common',
-      description: 'Un arc court simple.',
-      effects: '1d6 dégâts perçant.',
-      value: 25,
-      owner: 'Naïa Nightfrost',
-      location: 'Inventaire',
-      properties: ['perçant', 'distance']
-    },
-    {
-      id: '8',
-      name: 'Dague empoisonnée',
-      type: 'weapon',
-      rarity: 'rare',
-      description: 'Une dague dont la lame est enduite de poison.',
-      effects: '1d4 dégâts perçant + poison.',
-      value: 250,
-      owner: '',
-      location: 'Ceinture',
-      properties: ['perçant', 'poison']
-    },
-    {
-      id: '9',
-      name: 'Potion de force de géant des collines',
-      type: 'potion',
-      rarity: 'rare',
-      description: 'En buvant cette potion, vous gagnez une force incroyable.',
-      effects: 'Votre score de Force devient 21 pendant 1 heure. Les 5 doses sont dans une seule fiole.',
-      value: 150,
-      owner: 'Arannis Foxward',
-      location: 'Inventaire',
-      image: 'https://www.aidedd.org/images/potions/force-de-geant-des-collines.png',
-      properties: ['force', 'potion']
-    },
-    {
-      id: '10',
-      name: 'Cape de protection',
-      type: 'armor',
-      rarity: 'rare',
-      description: 'Vous confère un bonus de +1 à la CA et aux jets de sauvegarde.',
-      effects: '+1 à la CA et aux jets de sauvegarde',
-      value: 200,
-      owner: 'Caellum Brisemousse',
-      location: 'Portée',
-      image: 'https://www.aidedd.org/images/objets/cape-de-protection.png',
-      properties: ['protection', 'cape']
-    },
+      rarity: 'legendary',
+      description: 'L\'un des légendaires Joyaux Tendres, cette gemme violette pulse d\'une énergie mentale pure. Quête principale des Maraudeurs.',
+      effects: '+3 à la Sagesse (maximum 23). Permet de lancer "Vision mystique" 3 fois par jour. Confère la télépathie sur 36 mètres.',
+      value: 50000,
+      location: 'Sanctuaire Secret',
+      properties: ['Légendaire', 'Mental', 'Quête']
+    }
   ]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedType, setSelectedType] = useState('');
-  const [selectedRarity, setSelectedRarity] = useState('');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedType, setSelectedType] = useState<string>('all');
+  const [selectedRarity, setSelectedRarity] = useState<string>('all');
+  const [showAddForm, setShowAddForm] = useState(false);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
 
-  const getTypeColor = (type: string) => {
+  const filteredItems = items.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         item.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = selectedType === 'all' || item.type === selectedType;
+    const matchesRarity = selectedRarity === 'all' || item.rarity === selectedRarity;
+    return matchesSearch && matchesType && matchesRarity;
+  });
+
+  const handleSaveItem = (itemData: Omit<Item, 'id'>) => {
+    if (editingItem) {
+      // Modifier objet existant
+      setItems(prev => prev.map(item => 
+        item.id === editingItem.id 
+          ? { ...itemData, id: editingItem.id }
+          : item
+      ));
+      setEditingItem(null);
+    } else {
+      // Ajouter nouvel objet
+      const newItem: Item = {
+        ...itemData,
+        id: Date.now().toString()
+      };
+      setItems(prev => [...prev, newItem]);
+    }
+    console.log('Objet sauvegardé:', itemData);
+  };
+
+  const handleEditItem = (item: Item) => {
+    setEditingItem(item);
+    setShowAddForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowAddForm(false);
+    setEditingItem(null);
+  };
+
+  // Nouvelle fonction pour changer le propriétaire rapidement
+  const handleOwnerChange = (itemId: string, newOwner: string) => {
+    setItems(prev => prev.map(item => 
+      item.id === itemId 
+        ? { 
+            ...item, 
+            owner: newOwner === 'none' ? undefined : newOwner,
+            location: newOwner === 'none' ? 'Non attribué' : undefined
+          }
+        : item
+    ));
+    console.log(`Propriétaire changé pour l'objet ${itemId}: ${newOwner}`);
+  };
+
+  const getTypeIcon = (type: Item['type']) => {
     switch (type) {
-      case 'weapon': return 'bg-red-500/10 text-red-400 border-red-400/50';
-      case 'armor': return 'bg-blue-500/10 text-blue-400 border-blue-400/50';
-      case 'potion': return 'bg-green-500/10 text-green-400 border-green-400/50';
-      case 'scroll': return 'bg-yellow-500/10 text-yellow-400 border-yellow-400/50';
-      case 'treasure': return 'bg-purple-500/10 text-purple-400 border-purple-400/50';
-      default: return 'bg-gray-500/10 text-gray-400 border-gray-400/50';
+      case 'weapon': return <Sword className="w-4 h-4" />;
+      case 'armor': return <Shield className="w-4 h-4" />;
+      case 'potion': return <Zap className="w-4 h-4" />;
+      case 'scroll': return <Scroll className="w-4 h-4" />;
+      case 'treasure': return <Gem className="w-4 h-4" />;
+      default: return <Package className="w-4 h-4" />;
     }
   };
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'weapon': return <Sword className="w-3 h-3 mr-1" />;
-      case 'armor': return <Shield className="w-3 h-3 mr-1" />;
-      case 'potion': return <FlaskConical className="w-3 h-3 mr-1" />;
-      case 'scroll': return <Scroll className="w-3 h-3 mr-1" />;
-      case 'treasure': return <Crown className="w-3 h-3 mr-1" />;
-      default: return <Package className="w-3 h-3 mr-1" />;
+  const getRarityColor = (rarity: Item['rarity']) => {
+    switch (rarity) {
+      case 'common': return 'bg-gray-600/20 text-gray-300 border-gray-500/30';
+      case 'uncommon': return 'bg-green-600/20 text-green-300 border-green-500/30';
+      case 'rare': return 'bg-blue-600/20 text-blue-300 border-blue-500/30';
+      case 'very-rare': return 'bg-purple-600/20 text-purple-300 border-purple-500/30';
+      case 'legendary': return 'bg-gold-600/20 text-gold-300 border-gold-500/30';
+      default: return 'bg-gray-600/20 text-gray-300 border-gray-500/30';
     }
   };
 
-  const getTypeLabel = (type: string) => {
+  const getRarityName = (rarity: Item['rarity']) => {
+    switch (rarity) {
+      case 'very-rare': return 'Très Rare';
+      case 'legendary': return 'Légendaire';
+      default: return rarity.charAt(0).toUpperCase() + rarity.slice(1);
+    }
+  };
+
+  const getTypeName = (type: Item['type']) => {
     switch (type) {
       case 'weapon': return 'Arme';
       case 'armor': return 'Armure';
       case 'potion': return 'Potion';
       case 'scroll': return 'Parchemin';
       case 'treasure': return 'Trésor';
-      default: return 'Divers';
+      case 'misc': return 'Divers';
+      default: return type;
     }
   };
 
-  const getRarityColor = (rarity: string) => {
-    switch (rarity) {
-      case 'uncommon': return 'bg-green-500/10 text-green-400 border-green-400/50';
-      case 'rare': return 'bg-blue-500/10 text-blue-400 border-blue-400/50';
-      case 'very-rare': return 'bg-purple-500/10 text-purple-400 border-purple-400/50';
-      case 'legendary': return 'bg-orange-500/10 text-orange-400 border-orange-400/50';
-      default: return 'bg-gray-500/10 text-gray-400 border-gray-400/50';
-    }
+  const groupedItems = {
+    weapon: items.filter(item => item.type === 'weapon'),
+    armor: items.filter(item => item.type === 'armor'),
+    potion: items.filter(item => item.type === 'potion'),
+    scroll: items.filter(item => item.type === 'scroll'),
+    treasure: items.filter(item => item.type === 'treasure'),
+    misc: items.filter(item => item.type === 'misc')
   };
 
-  const getRarityLabel = (rarity: string) => {
-    switch (rarity) {
-      case 'uncommon': return 'Peu commun';
-      case 'rare': return 'Rare';
-      case 'very-rare': return 'Très rare';
-      case 'legendary': return 'Légendaire';
-      default: return 'Commun';
-    }
-  };
+  const ItemCard = ({ item }: { item: Item }) => (
+    <Card className="dungeon-card hover:scale-105 transition-transform duration-300">
+      <CardHeader className="pb-3">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-dungeon-700/50 rounded-lg flex items-center justify-center border border-gold-500/30">
+            {getTypeIcon(item.type)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-gold-200 text-sm sm:text-lg mb-1 truncate">{item.name}</CardTitle>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+              <Badge className={getRarityColor(item.rarity)}>
+                {getRarityName(item.rarity)}
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                {getTypeName(item.type)}
+              </Badge>
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3">
+          {item.description}
+        </p>
 
-  const filteredItems = items.filter(item => {
-    const searchMatch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const typeMatch = selectedType ? item.type === selectedType : true;
-    const rarityMatch = selectedRarity ? item.rarity === selectedRarity : true;
-    return searchMatch && typeMatch && rarityMatch;
-  }).sort((a, b) => {
-    const nameA = a.name.toLowerCase();
-    const nameB = b.name.toLowerCase();
-    return sortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
-  });
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-sm">
+          <span className="text-gold-300 font-semibold">{item.value.toLocaleString()} po</span>
+        </div>
 
-  const handleSaveItem = (item: Omit<Item, 'id'>) => {
-    if (editingItem) {
-      // Update existing item
-      setItems(prevItems =>
-        prevItems.map(i => (i.id === editingItem.id ? { ...i, ...item } : i))
-      );
-    } else {
-      // Create new item
-      setItems(prevItems => [...prevItems, { ...item, id: String(Date.now()) }]);
-    }
-    setEditingItem(null);
-    setIsFormOpen(false);
-  };
+        {/* Nouveau sélecteur de propriétaire */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <User className="w-3 h-3 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Propriétaire:</span>
+          </div>
+          <Select
+            value={item.owner || 'none'}
+            onValueChange={(value) => handleOwnerChange(item.id, value)}
+          >
+            <SelectTrigger className="h-8 text-xs bg-dungeon-800/50 border-gold-500/30">
+              <SelectValue placeholder="Sélectionner un joueur" />
+            </SelectTrigger>
+            <SelectContent className="bg-dungeon-800 border-gold-500/30">
+              <SelectItem value="none" className="text-xs">Non attribué</SelectItem>
+              {players.map((player) => (
+                <SelectItem key={player} value={player} className="text-xs">
+                  {player}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-  const handleDeleteItem = (id: string) => {
-    setItems(prevItems => prevItems.filter(item => item.id !== id));
-  };
+        {item.location && !item.owner && (
+          <div className="text-xs text-muted-foreground">
+            📍 {item.location}
+          </div>
+        )}
 
-  const updateItemOwner = (itemId: string, newOwner: string) => {
-    setItems(prevItems =>
-      prevItems.map(item =>
-        item.id === itemId ? { ...item, owner: newOwner === "none" ? "" : newOwner } : item
-      )
-    );
-  };
+        {item.properties && item.properties.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {item.properties.slice(0, 3).map((prop, index) => (
+              <Badge key={index} variant="outline" className="text-xs bg-dungeon-800/50">
+                {prop}
+              </Badge>
+            ))}
+            {item.properties.length > 3 && (
+              <span className="text-xs text-muted-foreground">+{item.properties.length - 3}</span>
+            )}
+          </div>
+        )}
 
-  const players = [
-    'Sfiri Fortenclume',
-    'Arannis Foxward', 
-    'Naïa Nightfrost',
-    'Caellum Brisemousse'
-  ];
+        <div className="flex gap-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="flex-1 border-gold-500/30 hover:bg-gold-600/20 text-xs sm:text-sm">
+                Détails
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl dungeon-card">
+              <DialogHeader>
+                <DialogTitle className="text-gold-200 text-xl flex items-center gap-2">
+                  {getTypeIcon(item.type)}
+                  {item.name}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Badge className={getRarityColor(item.rarity)}>
+                    {getRarityName(item.rarity)}
+                  </Badge>
+                  <Badge variant="outline">
+                    {getTypeName(item.type)}
+                  </Badge>
+                  <span className="text-gold-300 font-semibold text-lg ml-auto">
+                    {item.value.toLocaleString()} po
+                  </span>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-gold-200 mb-2">Description</h4>
+                  <p className="text-sm leading-relaxed">{item.description}</p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-gold-200 mb-2">Effets</h4>
+                  <p className="text-sm leading-relaxed text-green-300">{item.effects}</p>
+                </div>
+
+                {item.properties && item.properties.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gold-200 mb-2">Propriétés</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {item.properties.map((prop, index) => (
+                        <Badge key={index} variant="outline" className="bg-dungeon-800/50">
+                          {prop}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="border-t border-gold-500/20 pt-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-muted-foreground text-sm">Propriétaire:</span>
+                      <p className="text-gold-200 font-medium">
+                        {item.owner || 'Non attribué'}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground text-sm">Localisation:</span>
+                      <p className="text-gold-200 font-medium">
+                        {item.location || 'Inconnue'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleEditItem(item)}
+            className="border-gold-500/30 hover:bg-gold-600/20"
+          >
+            <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   return (
-    <div className="space-y-6">
-      {/* Header & Filters */}
+    <div className="space-y-4 sm:space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-fantasy font-bold text-gold-200 mb-2">
+          <h2 className="text-2xl sm:text-3xl font-fantasy font-bold text-gold-200 mb-2">
             Catalogue d'Objets
           </h2>
-          <p className="text-muted-foreground">
-            Inventaire des armes, armures et trésors de votre campagne
+          <p className="text-muted-foreground text-sm">
+            Gérez l'inventaire légendaire des Maraudeurs de Joyaux Tendres
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <Button className="bg-gold-600 hover:bg-gold-700 text-dungeon-900" onClick={() => setIsFormOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Ajouter un Objet
-          </Button>
-        </div>
+        <Button 
+          onClick={() => setShowAddForm(true)}
+          className="bg-gold-600 hover:bg-gold-700 text-dungeon-900 text-sm sm:text-base"
+          size="sm"
+        >
+          <Plus className="w-4 h-4 mr-1 sm:mr-2" />
+          <span className="hidden sm:inline">Nouvel Objet</span>
+          <span className="sm:hidden">Objet</span>
+        </Button>
       </div>
 
-      {/* Search & Filters */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center space-x-2 w-full md:w-auto">
-          <Input
-            type="text"
-            placeholder="Rechercher un objet..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-dungeon-800/50 border-gold-500/30 flex-1"
-          />
-          <Search className="w-4 h-4 text-gold-300 ml-2" />
+      <Tabs defaultValue="all" className="w-full">
+        <TabsList className="grid w-full grid-cols-7 bg-dungeon-800/50 border border-gold-500/30">
+          <TabsTrigger value="all" className="data-[state=active]:bg-gold-600/20 text-xs sm:text-sm">
+            Tous
+          </TabsTrigger>
+          <TabsTrigger value="weapon" className="data-[state=active]:bg-gold-600/20 text-xs sm:text-sm">
+            <Sword className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+            <span className="hidden sm:inline">Armes</span>
+          </TabsTrigger>
+          <TabsTrigger value="armor" className="data-[state=active]:bg-gold-600/20 text-xs sm:text-sm">
+            <Shield className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+            <span className="hidden sm:inline">Armures</span>
+          </TabsTrigger>
+          <TabsTrigger value="potion" className="data-[state=active]:bg-gold-600/20 text-xs sm:text-sm">
+            <Zap className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+            <span className="hidden sm:inline">Potions</span>
+          </TabsTrigger>
+          <TabsTrigger value="scroll" className="data-[state=active]:bg-gold-600/20 text-xs sm:text-sm">
+            <Scroll className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+            <span className="hidden sm:inline">Parchemins</span>
+          </TabsTrigger>
+          <TabsTrigger value="treasure" className="data-[state=active]:bg-gold-600/20 text-xs sm:text-sm">
+            <Gem className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+            <span className="hidden sm:inline">Trésors</span>
+          </TabsTrigger>
+          <TabsTrigger value="misc" className="data-[state=active]:bg-gold-600/20 text-xs sm:text-sm">
+            <Package className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+            <span className="hidden sm:inline">Divers</span>
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center mt-4">
+          <div className="relative flex-1 max-w-full sm:max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Rechercher un objet..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-dungeon-800/50 border-gold-500/30 text-sm"
+            />
+          </div>
+          <select
+            value={selectedRarity}
+            onChange={(e) => setSelectedRarity(e.target.value)}
+            className="px-3 py-2 rounded bg-dungeon-800/50 border border-gold-500/30 text-foreground text-sm"
+          >
+            <option value="all">Toutes les raretés</option>
+            <option value="common">Commun</option>
+            <option value="uncommon">Peu commun</option>
+            <option value="rare">Rare</option>
+            <option value="very-rare">Très rare</option>
+            <option value="legendary">Légendaire</option>
+          </select>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <Select value={selectedType} onValueChange={setSelectedType}>
-            <SelectTrigger className="w-[180px] bg-dungeon-800/50 border-gold-500/30">
-              <SelectValue placeholder="Type" />
-            </SelectTrigger>
-            <SelectContent className="bg-dungeon-800 border-gold-500/30">
-              <SelectItem value="">Tous les types</SelectItem>
-              <SelectItem value="weapon">Arme</SelectItem>
-              <SelectItem value="armor">Armure</SelectItem>
-              <SelectItem value="potion">Potion</SelectItem>
-              <SelectItem value="scroll">Parchemin</SelectItem>
-              <SelectItem value="treasure">Trésor</SelectItem>
-              <SelectItem value="misc">Divers</SelectItem>
-            </SelectContent>
-          </Select>
+        <TabsContent value="all" className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {filteredItems.map((item) => (
+              <ItemCard key={item.id} item={item} />
+            ))}
+          </div>
+        </TabsContent>
 
-          <Select value={selectedRarity} onValueChange={setSelectedRarity}>
-            <SelectTrigger className="w-[180px] bg-dungeon-800/50 border-gold-500/30">
-              <SelectValue placeholder="Rareté" />
-            </SelectTrigger>
-            <SelectContent className="bg-dungeon-800 border-gold-500/30">
-              <SelectItem value="">Toutes les raretés</SelectItem>
-              <SelectItem value="common">Commun</SelectItem>
-              <SelectItem value="uncommon">Peu commun</SelectItem>
-              <SelectItem value="rare">Rare</SelectItem>
-              <SelectItem value="very-rare">Très rare</SelectItem>
-              <SelectItem value="legendary">Légendaire</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Button variant="outline" size="icon" onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}>
-            <Filter className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Items Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredItems.map((item) => (
-          <Card key={item.id} className="dungeon-card group">
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <CardTitle className="text-gold-200 text-lg mb-2">{item.name}</CardTitle>
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    <Badge 
-                      className={`${getTypeColor(item.type)} text-xs`}
-                    >
-                      {getTypeIcon(item.type)}
-                      {getTypeLabel(item.type)}
-                    </Badge>
-                    <Badge 
-                      className={`${getRarityColor(item.rarity)} text-xs`}
-                    >
-                      {getRarityLabel(item.rarity)}
-                    </Badge>
-                    {item.image && (
-                      <VisualCard 
-                        image={item.image}
-                        title={item.name}
-                        description={item.description}
-                      />
-                    )}
-                  </div>
+        {/* Individual type tabs */}
+        {Object.entries(groupedItems).map(([type, typeItems]) => (
+          <TabsContent key={type} value={type} className="mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {typeItems.map((item) => (
+                <ItemCard key={item.id} item={item} />
+              ))}
+            </div>
+            {typeItems.length === 0 && (
+              <div className="text-center py-12">
+                <div className="w-12 h-12 mx-auto mb-4 bg-dungeon-700/50 rounded-lg flex items-center justify-center">
+                  {getTypeIcon(type as Item['type'])}
                 </div>
+                <h3 className="text-lg font-semibold text-gold-200 mb-2">
+                  Aucun {getTypeName(type as Item['type']).toLowerCase()}
+                </h3>
+                <p className="text-muted-foreground">
+                  Commencez par ajouter votre premier objet de ce type
+                </p>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {/* Description */}
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {item.description}
-              </p>
-
-              {/* Effects */}
-              {item.effects && (
-                <div>
-                  <h4 className="font-semibold text-gold-200 mb-1">Effets</h4>
-                  <p className="text-sm text-gold-300">{item.effects}</p>
-                </div>
-              )}
-
-              {/* Value */}
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gold-200">Valeur:</span>
-                <span className="text-sm text-gold-300">{item.value} po</span>
-              </div>
-
-              {/* Owner & Location */}
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gold-200">Localisation:</span>
-                <span className="text-sm text-gold-300">{item.location}</span>
-              </div>
-              
-              {/* Owner Quick Change */}
-              {item.owner && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gold-200">Propriétaire:</span>
-                  <Select
-                    value={item.owner || "none"}
-                    onValueChange={(newOwner) => updateItemOwner(item.id, newOwner)}
-                  >
-                    <SelectTrigger className="w-full bg-dungeon-800/50 border-gold-500/30">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-dungeon-800 border-gold-500/30">
-                      {players.map((player) => (
-                        <SelectItem key={player} value={player}>
-                          {player}
-                        </SelectItem>
-                      ))}
-                      <SelectItem value="none">Aucun propriétaire</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
-              {/* Properties */}
-              {item.properties && item.properties.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-gold-200 mb-1">Propriétés</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {item.properties.map((prop, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {prop}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-2">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => {
-                    setEditingItem(item);
-                    setIsFormOpen(true);
-                  }}
-                >
-                  <Edit2 className="w-4 h-4 mr-1" />
-                  Modifier
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => handleDeleteItem(item.id)}
-                >
-                  <Trash2 className="w-4 h-4 mr-1" />
-                  Supprimer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            )}
+          </TabsContent>
         ))}
-      </div>
-
-      {/* Item Form Dialog */}
+      </Tabs>
+      
       <ItemForm
-        isOpen={isFormOpen}
-        onClose={() => {
-          setIsFormOpen(false);
-          setEditingItem(null);
-        }}
+        isOpen={showAddForm}
+        onClose={handleCloseForm}
         onSave={handleSaveItem}
         editingItem={editingItem}
       />
