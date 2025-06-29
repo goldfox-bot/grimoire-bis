@@ -241,7 +241,7 @@ const ItemCatalog = () => {
   const updateItemOwner = (itemId: string, newOwner: string) => {
     setItems(prevItems =>
       prevItems.map(item =>
-        item.id === itemId ? { ...item, owner: newOwner } : item
+        item.id === itemId ? { ...item, owner: newOwner === "none" ? "" : newOwner } : item
       )
     );
   };
@@ -384,7 +384,7 @@ const ItemCatalog = () => {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gold-200">Propriétaire:</span>
                   <Select
-                    value={item.owner}
+                    value={item.owner || "none"}
                     onValueChange={(newOwner) => updateItemOwner(item.id, newOwner)}
                   >
                     <SelectTrigger className="w-full bg-dungeon-800/50 border-gold-500/30">
@@ -396,7 +396,7 @@ const ItemCatalog = () => {
                           {player}
                         </SelectItem>
                       ))}
-                      <SelectItem value="">Aucun propriétaire</SelectItem>
+                      <SelectItem value="none">Aucun propriétaire</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
