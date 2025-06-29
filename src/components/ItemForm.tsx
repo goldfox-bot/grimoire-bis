@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Save, X } from "lucide-react";
+import ImageUpload from "./ImageUpload";
 
 interface Item {
   id: string;
@@ -39,6 +39,7 @@ const ItemForm = ({ isOpen, onClose, onSave, editingItem }: ItemFormProps) => {
     value: editingItem?.value || 0,
     owner: editingItem?.owner || '',
     location: editingItem?.location || '',
+    image: editingItem?.image || '',
     properties: editingItem?.properties || []
   });
 
@@ -61,6 +62,7 @@ const ItemForm = ({ isOpen, onClose, onSave, editingItem }: ItemFormProps) => {
       value: 0,
       owner: '',
       location: '',
+      image: '',
       properties: []
     });
   };
@@ -103,6 +105,21 @@ const ItemForm = ({ isOpen, onClose, onSave, editingItem }: ItemFormProps) => {
                 required
               />
             </div>
+            
+            {/* Image Upload Section */}
+            <div className="sm:col-span-2">
+              <Label className="text-gold-200">Visuel</Label>
+              <div className="flex items-center gap-2 mt-1">
+                <ImageUpload
+                  currentImage={formData.image}
+                  onImageChange={(imageUrl) => setFormData(prev => ({ ...prev, image: imageUrl || '' }))}
+                />
+                {formData.image && (
+                  <span className="text-xs text-green-400">✓ Image ajoutée</span>
+                )}
+              </div>
+            </div>
+            
             <div>
               <Label htmlFor="type" className="text-gold-200">Type</Label>
               <select
