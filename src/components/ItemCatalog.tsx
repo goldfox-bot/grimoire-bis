@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,11 +27,10 @@ interface Item {
 const ItemCatalog = () => {
   // Liste des joueurs disponibles
   const players = [
-    'Kael le Brave',
-    'Dame Lumina',
-    'Eldric le Sage',
-    'Lyra Chantelame',
-    'Thorin Barbe-de-Fer'
+    'Sfiri Fortenclume',
+    'Arannis Foxward',
+    'Naïa Nightfrost',
+    'Caellum Brisemousse'
   ];
 
   const [items, setItems] = useState<Item[]>([
@@ -42,7 +42,7 @@ const ItemCatalog = () => {
       description: 'Cette épée longue ancienne brille d\'une flamme dorée qui ne s\'éteint jamais. Forgée par les maîtres elfes il y a des millénaires.',
       effects: '+2 aux jets d\'attaque et de dégâts. Inflige 1d6 dégâts de feu supplémentaires. Émet une lumière vive dans un rayon de 3 mètres.',
       value: 5000,
-      owner: 'Kael le Brave',
+      owner: 'Arannis Foxward',
       properties: ['Magique', 'Feu', 'Lumineux']
     },
     {
@@ -53,7 +53,7 @@ const ItemCatalog = () => {
       description: 'Armure de plates ornée de motifs stellaires qui scintillent dans l\'obscurité. Portée par les anciens gardiens des temples célestes.',
       effects: 'CA 18 + mod Dex (max 2). Résistance aux dégâts radiants. Une fois par jour, peut lancer "Bouclier de foi".',
       value: 8000,
-      owner: 'Dame Lumina',
+      owner: 'Sfiri Fortenclume',
       properties: ['Magique', 'Radiant', 'Stellaire']
     },
     {
