@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Search, Edit2, Trash2, Sword, Shield, Flask, Scroll, Crown, Package, Filter } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, Sword, Shield, FlaskConical, Scroll, Crown, Package, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import ItemForm from "./ItemForm";
 import VisualCard from "./VisualCard";
@@ -171,7 +171,7 @@ const ItemCatalog = () => {
     switch (type) {
       case 'weapon': return <Sword className="w-3 h-3 mr-1" />;
       case 'armor': return <Shield className="w-3 h-3 mr-1" />;
-      case 'potion': return <Flask className="w-3 h-3 mr-1" />;
+      case 'potion': return <FlaskConical className="w-3 h-3 mr-1" />;
       case 'scroll': return <Scroll className="w-3 h-3 mr-1" />;
       case 'treasure': return <Crown className="w-3 h-3 mr-1" />;
       default: return <Package className="w-3 h-3 mr-1" />;
