@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Search, Plus, Sword, Shield, Zap, Scroll, Gem, Package, Edit } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, Plus, Sword, Shield, Zap, Scroll, Gem, Package, Edit, User } from "lucide-react";
 import ItemForm from "./ItemForm";
 
 interface Item {
@@ -23,6 +24,15 @@ interface Item {
 }
 
 const ItemCatalog = () => {
+  // Liste des joueurs disponibles
+  const players = [
+    'Kael le Brave',
+    'Dame Lumina',
+    'Eldric le Sage',
+    'Lyra Chantelame',
+    'Thorin Barbe-de-Fer'
+  ];
+
   const [items, setItems] = useState<Item[]>([
     {
       id: '1',
@@ -125,6 +135,20 @@ const ItemCatalog = () => {
     setEditingItem(null);
   };
 
+  // Nouvelle fonction pour changer le propriétaire rapidement
+  const handleOwnerChange = (itemId: string, newOwner: string) => {
+    setItems(prev => prev.map(item => 
+      item.id === itemId 
+        ? { 
+            ...item, 
+            owner: newOwner === 'none' ? undefined : newOwner,
+            location: newOwner === 'none' ? 'Non attribué' : undefined
+          }
+        : item
+    ));
+    console.log(`Propriétaire changé pour l'objet ${itemId}: ${newOwner}`);
+  };
+
   const getTypeIcon = (type: Item['type']) => {
     switch (type) {
       case 'weapon': return <Sword className="w-4 h-4" />;
@@ -203,11 +227,37 @@ const ItemCatalog = () => {
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-sm">
           <span className="text-gold-300 font-semibold">{item.value.toLocaleString()} po</span>
-          <span className="text-muted-foreground text-xs sm:text-sm">
-            {item.owner ? `${item.owner}` : 
-             item.location ? `${item.location}` : 'Non attribué'}
-          </span>
         </div>
+
+        {/* Nouveau sélecteur de propriétaire */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <User className="w-3 h-3 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Propriétaire:</span>
+          </div>
+          <Select
+            value={item.owner || 'none'}
+            onValueChange={(value) => handleOwnerChange(item.id, value)}
+          >
+            <SelectTrigger className="h-8 text-xs bg-dungeon-800/50 border-gold-500/30">
+              <SelectValue placeholder="Sélectionner un joueur" />
+            </SelectTrigger>
+            <SelectContent className="bg-dungeon-800 border-gold-500/30">
+              <SelectItem value="none" className="text-xs">Non attribué</SelectItem>
+              {players.map((player) => (
+                <SelectItem key={player} value={player} className="text-xs">
+                  {player}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {item.location && !item.owner && (
+          <div className="text-xs text-muted-foreground">
+            📍 {item.location}
+          </div>
+        )}
 
         {item.properties && item.properties.length > 0 && (
           <div className="flex flex-wrap gap-1">
