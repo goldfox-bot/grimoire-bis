@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Sword, Shield, Crown, Sparkles } from "lucide-react";
+import grimoireLogo from "@/assets/grimoire-logo.png";
 import NPCDirectory from "@/components/NPCDirectory";
 import ItemCatalog from "@/components/ItemCatalog";
 import GroupPanel from "@/components/GroupPanel";
@@ -16,6 +17,13 @@ const Index = () => {
     <div className="min-h-screen p-3 sm:p-6">
       {/* Header */}
       <div className="text-center mb-8 sm:mb-12">
+        <div className="float-animation mb-6 sm:mb-8">
+          <img 
+            src={grimoireLogo} 
+            alt="Grimoire" 
+            className="mx-auto h-16 sm:h-20 md:h-24 object-contain filter drop-shadow-lg"
+          />
+        </div>
         <div className="float-animation">
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-fantasy font-bold adventure-glow mb-4 sm:mb-6 leading-tight">
             <div>Les Maraudeurs</div>
