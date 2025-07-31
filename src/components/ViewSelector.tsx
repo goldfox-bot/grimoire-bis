@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Crown, User } from "lucide-react";
@@ -9,12 +10,20 @@ interface ViewSelectorProps {
 }
 
 const ViewSelector = ({ currentView, onViewChange }: ViewSelectorProps) => {
+  const navigate = useNavigate();
+
+  const handleViewChange = (view: "dm" | "player") => {
+    onViewChange(view);
+    // Navigate to the corresponding route
+    navigate(view === "dm" ? "/dm" : "/player");
+  };
+
   return (
     <div className="flex items-center gap-2 p-2 bg-card/50 rounded-lg border border-border/50">
       <Button
         variant={currentView === "dm" ? "default" : "ghost"}
         size="sm"
-        onClick={() => onViewChange("dm")}
+        onClick={() => handleViewChange("dm")}
         className={`flex items-center gap-2 ${
           currentView === "dm" 
             ? "bg-primary text-primary-foreground" 
@@ -29,7 +38,7 @@ const ViewSelector = ({ currentView, onViewChange }: ViewSelectorProps) => {
       <Button
         variant={currentView === "player" ? "default" : "ghost"}
         size="sm"
-        onClick={() => onViewChange("player")}
+        onClick={() => handleViewChange("player")}
         className={`flex items-center gap-2 ${
           currentView === "player" 
             ? "bg-primary text-primary-foreground" 
