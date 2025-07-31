@@ -17,6 +17,7 @@ import NPCDirectory from "./components/NPCDirectory";
 import ItemCatalog from "./components/ItemCatalog";
 import GroupPanel from "./components/GroupPanel";
 import InteractiveMap from "./components/InteractiveMap";
+import QuestManager from "./components/QuestManager";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,7 @@ const AppContent = () => {
             <Routes>
               {/* Routes MJ */}
               <Route path="/dm" element={<DMDashboard />} />
+              <Route path="/dm/quests" element={<QuestManager />} />
               <Route path="/dm/npcs" element={<NPCDirectory />} />
               <Route path="/dm/items" element={<ItemCatalog />} />
               <Route path="/dm/group" element={<GroupPanel />} />

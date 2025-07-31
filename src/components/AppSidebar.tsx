@@ -36,6 +36,7 @@ interface AppSidebarProps {
 
 const dmItems = [
   { title: "Tableau de Bord", url: "/dm", icon: Home },
+  { title: "Gestion des Quêtes", url: "/dm/quests", icon: ScrollText },
   { title: "PNJ", url: "/dm/npcs", icon: Users },
   { title: "Objets", url: "/dm/items", icon: Sword },
   { title: "Groupe", url: "/dm/group", icon: Shield },
