@@ -7,7 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Plus, Sword, Shield, Zap, Scroll, Gem, Package, Edit, User } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
+import { Search, Plus, Sword, Shield, Zap, Scroll, Gem, Package, Edit, User, ImagePlus } from "lucide-react";
 import ItemForm from "./ItemForm";
 
 interface Item {
@@ -149,6 +151,19 @@ const ItemCatalog = () => {
     console.log(`Propriétaire changé pour l'objet ${itemId}: ${newOwner}`);
   };
 
+  const handleImageSave = (itemId: string, imageData: string) => {
+    setItems(prev => prev.map(item => item.id === itemId ? { ...item, image: imageData } : item));
+    console.log(`Visuel mis à jour pour l'objet ${itemId}`);
+  };
+
+  const fileToDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
   const getTypeIcon = (type: Item['type']) => {
     switch (type) {
       case 'weapon': return <Sword className="w-4 h-4" />;
@@ -200,6 +215,64 @@ const ItemCatalog = () => {
     misc: items.filter(item => item.type === 'misc')
   };
 
+  // Combobox de propriétaire (recherche + création rapide)
+  const OwnerCombobox = ({ item }: { item: Item }) => {
+    const [open, setOpen] = useState(false);
+    const [search, setSearch] = useState("");
+    const knownOwners = Array.from(new Set(items.map(i => i.owner).filter(Boolean) as string[]));
+    const owners = ["Non attribué", ...players, ...knownOwners.filter(o => !players.includes(o))];
+
+    const selectOwner = (value: string) => {
+      if (value === "Non attribué") {
+        handleOwnerChange(item.id, 'none');
+      } else {
+        handleOwnerChange(item.id, value);
+      }
+      setOpen(false);
+      setSearch("");
+    };
+
+    return (
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button variant="outline" size="sm" className="h-8 justify-between w-full bg-dungeon-800/50 border-gold-500/30">
+            <span className="truncate text-xs">{item.owner || 'Non attribué'}</span>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-64 z-50">
+          <Command>
+            <CommandInput
+              value={search}
+              onValueChange={setSearch}
+              placeholder="Rechercher un joueur..."
+            />
+            <CommandList>
+              <CommandEmpty>Aucun résultat.</CommandEmpty>
+              <CommandGroup heading="Propriétaires">
+                <CommandItem onSelect={() => selectOwner('Non attribué')}>Non attribué</CommandItem>
+                {owners.filter(o => o && o !== 'Non attribué').map((o) => (
+                  <CommandItem key={o} value={o} onSelect={() => selectOwner(o)}>
+                    {o}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+              {search && !owners.includes(search) && (
+                <>
+                  <CommandSeparator />
+                  <CommandGroup heading="Créer">
+                    <CommandItem onSelect={() => selectOwner(search)}>
+                      Ajouter "{search}"
+                    </CommandItem>
+                  </CommandGroup>
+                </>
+              )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    );
+  };
+
   const ItemCard = ({ item }: { item: Item }) => (
     <Card className="dungeon-card hover:scale-105 transition-transform duration-300">
       <CardHeader className="pb-3">
@@ -229,28 +302,13 @@ const ItemCatalog = () => {
           <span className="text-gold-300 font-semibold">{item.value.toLocaleString()} po</span>
         </div>
 
-        {/* Nouveau sélecteur de propriétaire */}
+        {/* Sélecteur de propriétaire amélioré (combobox) */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <User className="w-3 h-3 text-muted-foreground" />
             <span className="text-xs text-muted-foreground">Propriétaire:</span>
           </div>
-          <Select
-            value={item.owner || 'none'}
-            onValueChange={(value) => handleOwnerChange(item.id, value)}
-          >
-            <SelectTrigger className="h-8 text-xs bg-dungeon-800/50 border-gold-500/30">
-              <SelectValue placeholder="Sélectionner un joueur" />
-            </SelectTrigger>
-            <SelectContent className="bg-dungeon-800 border-gold-500/30">
-              <SelectItem value="none" className="text-xs">Non attribué</SelectItem>
-              {players.map((player) => (
-                <SelectItem key={player} value={player} className="text-xs">
-                  {player}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <OwnerCombobox item={item} />
         </div>
 
         {item.location && !item.owner && (
@@ -338,6 +396,41 @@ const ItemCatalog = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="flex-1 border-gold-500/30 hover:bg-gold-600/20 text-xs sm:text-sm">
+                <ImagePlus className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                Visuel
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md dungeon-card">
+              <DialogHeader>
+                <DialogTitle className="text-gold-200">Visuel de carte TCG</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-3">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  className="bg-dungeon-800/50 border-gold-500/30"
+                  onChange={async (e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (file) {
+                      const dataUrl = await fileToDataUrl(file);
+                      handleImageSave(item.id, dataUrl);
+                    }
+                  }}
+                />
+                {item.image && (
+                  <img
+                    src={item.image}
+                    alt={`Aperçu visuel ${item.name}`}
+                    loading="lazy"
+                    className="w-full aspect-[2.5/3.5] object-cover rounded-lg border border-gold-500/30"
+                  />
+                )}
               </div>
             </DialogContent>
           </Dialog>

@@ -39,6 +39,7 @@ const ItemForm = ({ isOpen, onClose, onSave, editingItem }: ItemFormProps) => {
     value: editingItem?.value || 0,
     owner: editingItem?.owner || '',
     location: editingItem?.location || '',
+    image: editingItem?.image || '',
     properties: editingItem?.properties || []
   });
 
@@ -61,6 +62,7 @@ const ItemForm = ({ isOpen, onClose, onSave, editingItem }: ItemFormProps) => {
       value: 0,
       owner: '',
       location: '',
+      image: '',
       properties: []
     });
   };
@@ -166,7 +168,31 @@ const ItemForm = ({ isOpen, onClose, onSave, editingItem }: ItemFormProps) => {
                 placeholder="Optionnel"
               />
             </div>
-          </div>
+            <div className="sm:col-span-2">
+              <Label htmlFor="image" className="text-gold-200">Visuel (optionnel)</Label>
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                className="bg-dungeon-800/50 border-gold-500/30"
+                onChange={(e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0]
+                  if (!file) return
+                  const reader = new FileReader()
+                  reader.onload = () => setFormData(prev => ({ ...prev, image: reader.result as string }))
+                  reader.readAsDataURL(file)
+                }}
+              />
+                {formData.image && (
+                  <img
+                    src={formData.image}
+                    alt={`Aperçu visuel ${formData.name || 'objet'}`}
+                    loading="lazy"
+                    className="mt-2 w-full aspect-[2.5/3.5] object-cover rounded-lg border border-gold-500/30"
+                  />
+                )}
+              </div>
+            </div>
 
           <div>
             <Label htmlFor="description" className="text-gold-200">Description</Label>
