@@ -3,9 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { User, Package, BookOpen, Map, Heart, Zap, Shield, Sword } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useCharacter } from "@/contexts/CharacterContext";
 
 const PlayerDashboard = () => {
   const navigate = useNavigate();
+  const { selectedCharacter } = useCharacter();
+
+  if (!selectedCharacter) {
+    return (
+      <div className="p-6 text-center">
+        <h2 className="text-2xl font-bold text-muted-foreground mb-4">
+          Aucun personnage sélectionné
+        </h2>
+        <p className="text-muted-foreground">
+          Veuillez sélectionner un personnage dans la barre latérale pour accéder à votre tableau de bord.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-8">
@@ -28,10 +43,10 @@ const PlayerDashboard = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-xl text-slate-100">
             <User className="w-6 h-6 text-blue-400" />
-            Elara Sombrelune
+            {selectedCharacter.name}
           </CardTitle>
           <CardDescription>
-            Rôdeuse Elfe • Niveau 6 • Archétype Chasseuse
+            {selectedCharacter.race} {selectedCharacter.class} • Niveau {selectedCharacter.level}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -39,29 +54,29 @@ const PlayerDashboard = () => {
             <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-400/20 rounded-lg">
               <Heart className="w-5 h-5 text-red-400" />
               <div>
-                <p className="text-lg font-bold text-red-300">78/85</p>
+                <p className="text-lg font-bold text-red-300">{selectedCharacter.stats.hp.current}/{selectedCharacter.stats.hp.max}</p>
                 <p className="text-xs text-red-200">Points de Vie</p>
               </div>
             </div>
             <div className="flex items-center gap-2 p-3 bg-blue-500/10 border border-blue-400/20 rounded-lg">
               <Zap className="w-5 h-5 text-blue-400" />
               <div>
-                <p className="text-lg font-bold text-blue-300">12/15</p>
+                <p className="text-lg font-bold text-blue-300">{selectedCharacter.stats.ac}</p>
                 <p className="text-xs text-blue-200">Classe d'Armure</p>
               </div>
             </div>
             <div className="flex items-center gap-2 p-3 bg-green-500/10 border border-green-400/20 rounded-lg">
               <Shield className="w-5 h-5 text-green-400" />
               <div>
-                <p className="text-lg font-bold text-green-300">+4</p>
+                <p className="text-lg font-bold text-green-300">+{selectedCharacter.stats.proficiencyBonus}</p>
                 <p className="text-xs text-green-200">Bonus Profil</p>
               </div>
             </div>
             <div className="flex items-center gap-2 p-3 bg-purple-500/10 border border-purple-400/20 rounded-lg">
               <Sword className="w-5 h-5 text-purple-400" />
               <div>
-                <p className="text-lg font-bold text-purple-300">1d8+3</p>
-                <p className="text-xs text-purple-200">Dégâts Arc</p>
+                <p className="text-lg font-bold text-purple-300">{selectedCharacter.stats.weaponDamage}</p>
+                <p className="text-xs text-purple-200">Dégâts Arme</p>
               </div>
             </div>
           </div>
@@ -91,15 +106,15 @@ const PlayerDashboard = () => {
             <div className="space-y-2 mb-4">
               <div className="flex justify-between text-sm">
                 <span className="text-slate-300">Pièces d'or</span>
-                <span className="text-amber-300 font-bold">247 po</span>
+                <span className="text-amber-300 font-bold">{selectedCharacter.inventory.gold} po</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-slate-300">Objets équipés</span>
-                <span className="text-blue-300">8/12</span>
+                <span className="text-blue-300">{selectedCharacter.inventory.equippedItems}/{selectedCharacter.inventory.maxEquipped}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-slate-300">Poids transporté</span>
-                <span className="text-green-300">45/65 kg</span>
+                <span className="text-green-300">{selectedCharacter.inventory.weight.current}/{selectedCharacter.inventory.weight.max} kg</span>
               </div>
             </div>
             <Button 
@@ -124,14 +139,13 @@ const PlayerDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-2 mb-4">
-              <div className="p-2 bg-emerald-500/10 border border-emerald-400/20 rounded text-sm">
-                <span className="text-emerald-300 font-medium">Active:</span> Les Cristaux Perdus
-              </div>
-              <div className="p-2 bg-blue-500/10 border border-blue-400/20 rounded text-sm">
-                <span className="text-blue-300 font-medium">En cours:</span> Le Marchand Disparu
-              </div>
+              {selectedCharacter.quests.active.map((quest, index) => (
+                <div key={quest.id} className="p-2 bg-emerald-500/10 border border-emerald-400/20 rounded text-sm">
+                  <span className="text-emerald-300 font-medium">Active:</span> {quest.title}
+                </div>
+              ))}
               <div className="text-xs text-slate-400">
-                3 quêtes terminées cette session
+                {selectedCharacter.quests.completed.length} quêtes terminées
               </div>
             </div>
             <Button 
@@ -157,13 +171,13 @@ const PlayerDashboard = () => {
           <CardContent>
             <div className="space-y-2 mb-4">
               <div className="text-sm text-slate-300">
-                <span className="text-cyan-300 font-medium">12</span> lieux découverts
+                <span className="text-cyan-300 font-medium">{selectedCharacter.exploration.locationsDiscovered}</span> lieux découverts
               </div>
               <div className="text-sm text-slate-300">
-                <span className="text-purple-300 font-medium">3</span> donjons explorés
+                <span className="text-purple-300 font-medium">{selectedCharacter.exploration.dungeonsExplored}</span> donjons explorés
               </div>
               <div className="text-sm text-slate-300">
-                <span className="text-green-300 font-medium">5</span> villes visitées
+                <span className="text-green-300 font-medium">{selectedCharacter.exploration.citiesVisited}</span> villes visitées
               </div>
             </div>
             <Button 
@@ -179,19 +193,19 @@ const PlayerDashboard = () => {
       {/* Progression et Statistiques */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         <div className="stats-card p-6 text-center">
-          <h3 className="text-3xl font-bold text-orange-300 mb-2">6</h3>
+          <h3 className="text-3xl font-bold text-orange-300 mb-2">{selectedCharacter.level}</h3>
           <p className="text-sm text-slate-400 font-medium">Niveau Actuel</p>
         </div>
         <div className="stats-card p-6 text-center">
-          <h3 className="text-3xl font-bold text-orange-300 mb-2">2,840</h3>
+          <h3 className="text-3xl font-bold text-orange-300 mb-2">{selectedCharacter.xp.total.toLocaleString()}</h3>
           <p className="text-sm text-slate-400 font-medium">XP Total</p>
         </div>
         <div className="stats-card p-6 text-center">
-          <h3 className="text-3xl font-bold text-orange-300 mb-2">15</h3>
+          <h3 className="text-3xl font-bold text-orange-300 mb-2">{selectedCharacter.quests.completed.length}</h3>
           <p className="text-sm text-slate-400 font-medium">Quêtes Terminées</p>
         </div>
         <div className="stats-card p-6 text-center">
-          <h3 className="text-3xl font-bold text-orange-300 mb-2">8</h3>
+          <h3 className="text-3xl font-bold text-orange-300 mb-2">{selectedCharacter.sessionsPlayed}</h3>
           <p className="text-sm text-slate-400 font-medium">Sessions Jouées</p>
         </div>
       </div>

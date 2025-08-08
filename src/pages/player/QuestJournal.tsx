@@ -15,11 +15,28 @@ import {
   Coins,
   Scroll
 } from "lucide-react";
+import { useCharacter } from "@/contexts/CharacterContext";
 
 const QuestJournal = () => {
   const [selectedTab, setSelectedTab] = useState("active");
+  const { selectedCharacter } = useCharacter();
 
-  const quests = {
+  if (!selectedCharacter) {
+    return (
+      <div className="p-6 text-center">
+        <h2 className="text-2xl font-bold text-muted-foreground mb-4">
+          Aucun personnage sélectionné
+        </h2>
+        <p className="text-muted-foreground">
+          Veuillez sélectionner un personnage dans la barre latérale pour voir ses quêtes.
+        </p>
+      </div>
+    );
+  }
+
+  const quests = selectedCharacter.quests.active.length > 0 || selectedCharacter.quests.completed.length > 0 
+    ? selectedCharacter.quests 
+    : {
     active: [
       {
         id: 1,

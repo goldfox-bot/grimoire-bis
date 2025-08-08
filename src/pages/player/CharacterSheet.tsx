@@ -16,17 +16,33 @@ import {
   Crown,
   Target
 } from "lucide-react";
+import { useCharacter } from "@/contexts/CharacterContext";
 
 const CharacterSheet = () => {
+  const { selectedCharacter } = useCharacter();
+
+  if (!selectedCharacter) {
+    return (
+      <div className="p-6 text-center">
+        <h2 className="text-2xl font-bold text-muted-foreground mb-4">
+          Aucun personnage sélectionné
+        </h2>
+        <p className="text-muted-foreground">
+          Veuillez sélectionner un personnage dans la barre latérale pour voir sa fiche.
+        </p>
+      </div>
+    );
+  }
+
   const character = {
-    name: "Elara Sombrelune",
-    race: "Elfe",
-    class: "Rôdeuse",
-    level: 6,
-    archetype: "Chasseuse",
-    hp: { current: 78, max: 85 },
-    ac: 15,
-    proficiencyBonus: 4,
+    name: selectedCharacter.name,
+    race: selectedCharacter.race,
+    class: selectedCharacter.class,
+    level: selectedCharacter.level,
+    archetype: "Aventurier",
+    hp: selectedCharacter.stats.hp,
+    ac: selectedCharacter.stats.ac,
+    proficiencyBonus: selectedCharacter.stats.proficiencyBonus,
     speed: 30,
     stats: {
       strength: 12,

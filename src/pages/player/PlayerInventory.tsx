@@ -15,13 +15,28 @@ import {
   Shirt,
   FlaskConical
 } from "lucide-react";
+import { useCharacter } from "@/contexts/CharacterContext";
 
 const PlayerInventory = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const { selectedCharacter } = useCharacter();
+
+  if (!selectedCharacter) {
+    return (
+      <div className="p-6 text-center">
+        <h2 className="text-2xl font-bold text-muted-foreground mb-4">
+          Aucun personnage sélectionné
+        </h2>
+        <p className="text-muted-foreground">
+          Veuillez sélectionner un personnage dans la barre latérale pour voir son inventaire.
+        </p>
+      </div>
+    );
+  }
 
   const inventory = {
-    coins: { gold: 247, silver: 15, copper: 8 },
-    capacity: { current: 45, max: 65 },
+    coins: { gold: selectedCharacter.inventory.gold, silver: 15, copper: 8 },
+    capacity: { current: selectedCharacter.inventory.weight.current, max: selectedCharacter.inventory.weight.max },
     items: [
       {
         id: 1,

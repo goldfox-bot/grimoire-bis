@@ -1,50 +1,12 @@
-import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Crown } from "lucide-react";
+import { User } from "lucide-react";
+import { useCharacter } from "@/contexts/CharacterContext";
 
-interface Character {
-  id: string;
-  name: string;
-  class: string;
-  level: number;
-  race: string;
-  avatar?: string;
-}
-
-interface CharacterSelectorProps {
-  selectedCharacter: string | null;
-  onCharacterChange: (characterId: string | null) => void;
-}
-
-const CharacterSelector = ({ selectedCharacter, onCharacterChange }: CharacterSelectorProps) => {
-  const [characters] = useState<Character[]>([
-    { 
-      id: "1", 
-      name: "Elara Sombrelune", 
-      class: "Rôdeuse", 
-      level: 6, 
-      race: "Elfe",
-      avatar: "/lovable-uploads/28fdad4b-3c72-4129-92f0-49785e88c8d3.png"
-    },
-    { 
-      id: "2", 
-      name: "Thorin Barbe-de-Fer", 
-      class: "Guerrier", 
-      level: 5, 
-      race: "Nain"
-    },
-    { 
-      id: "3", 
-      name: "Lyralei Chantevie", 
-      class: "Barde", 
-      level: 4, 
-      race: "Halfeline"
-    }
-  ]);
-
-  const selectedChar = characters.find(c => c.id === selectedCharacter);
+const CharacterSelector = () => {
+  const { selectedCharacterId, setSelectedCharacterId, getAllCharacters, selectedCharacter: selectedChar } = useCharacter();
+  const characters = getAllCharacters();
 
   return (
     <div className="space-y-3">
@@ -53,7 +15,7 @@ const CharacterSelector = ({ selectedCharacter, onCharacterChange }: CharacterSe
         <span>Sélectionner un personnage</span>
       </div>
       
-      <Select value={selectedCharacter || ""} onValueChange={(value) => onCharacterChange(value || null)}>
+      <Select value={selectedCharacterId || ""} onValueChange={(value) => setSelectedCharacterId(value || null)}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Choisir un personnage...">
             {selectedChar && (

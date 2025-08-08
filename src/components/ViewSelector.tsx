@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Crown, User } from "lucide-react";
@@ -12,7 +11,6 @@ interface ViewSelectorProps {
 
 const ViewSelector = ({ currentView, onViewChange }: ViewSelectorProps) => {
   const navigate = useNavigate();
-  const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
 
   const handleViewChange = (view: "dm" | "player") => {
     onViewChange(view);
@@ -61,10 +59,9 @@ const ViewSelector = ({ currentView, onViewChange }: ViewSelectorProps) => {
       </div>
       
       {currentView === "player" && (
-        <CharacterSelector 
-          selectedCharacter={selectedCharacter}
-          onCharacterChange={setSelectedCharacter}
-        />
+        <div className="mt-4">
+          <CharacterSelector />
+        </div>
       )}
     </div>
   );
