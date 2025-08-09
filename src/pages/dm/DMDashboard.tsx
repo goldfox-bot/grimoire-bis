@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Sword, Shield, Sparkles, Map, Plus } from "lucide-react";
+import { Users, Sword, Shield, , Sparkles, User, Map, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const DMDashboard = () => {
@@ -150,7 +150,31 @@ const DMDashboard = () => {
             </Button>
           </CardContent>
         </Card>
-      </div>
+ 
+              {/* Personnages */}
+        <Card className="modern-card group">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3 text-lg text-slate-100 group-hover:text-orange-200 transition-colors">
+              <User className="w-6 h-6 text-indigo-400" />
+              Personnages
+            </CardTitle>
+            <CardDescription>
+              Gérez les fiches de vos personnages joueurs
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm mb-6 text-slate-300 leading-relaxed">
+              Accédez aux statistiques, inventaires et progression des PJ pour les modifier en temps réel.
+            </p>
+            <Button
+              onClick={() => navigate("/dm/characters")}
+              className="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700"
+            >
+              Gérer les Personnages
+            </Button>
+          </CardContent>
+        </Card>
+</div>
 
       {/* Statistiques Rapides */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
