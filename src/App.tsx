@@ -10,6 +10,7 @@ import { CharacterProvider } from "@/contexts/CharacterContext";
 
 // Pages
 import DMDashboard from "./pages/dm/DMDashboard";
+import CharacterManager from "./pages/dm/CharacterManager";
 import PlayerDashboard from "./pages/player/PlayerDashboard";
 import CharacterSheet from "./pages/player/CharacterSheet";
 import PlayerInventory from "./pages/player/PlayerInventory";
@@ -61,6 +62,8 @@ const AppContent = () => {
               <Route path="/dm" element={<DMDashboard />} />
               <Route path="/dm/quests" element={<QuestManager />} />
               <Route path="/dm/npcs" element={<NPCDirectory />} />
+                              <Route path="/dm/characters" element={<CharacterManager />} />
+              
               <Route path="/dm/items" element={<ItemCatalog />} />
               <Route path="/dm/group" element={<GroupPanel />} />
               <Route path="/dm/map" element={<InteractiveMap />} />
